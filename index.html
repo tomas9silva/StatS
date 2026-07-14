@@ -174,13 +174,13 @@ button:hover::after,button:focus-visible::after{
           <span class="analysisLabel">HEATMAP E POSICIONAMENTO</span>
         </div>
         <div class="analysisVisual">
-          <svg viewBox="0 0 320 230" role="img" aria-label="Gráfico de momento do jogo">
+          <svg viewBox="0 0 320 230" role="img" aria-label="Gráfico de Attack Momentum">
             <rect width="320" height="230" rx="22" fill="#f8fafb"/>
             <g stroke="#dfe5ea" stroke-width="1"><line x1="28" y1="45" x2="292" y2="45"/><line x1="28" y1="90" x2="292" y2="90"/><line x1="28" y1="135" x2="292" y2="135"/><line x1="28" y1="180" x2="292" y2="180"/></g>
             <path d="M28 165 C52 150,58 112,80 122 S111 165,132 128 S161 76,183 93 S212 152,234 118 S264 53,292 70" fill="none" stroke="var(--primary)" stroke-width="7" stroke-linecap="round"/>
             <path d="M28 165 C52 150,58 112,80 122 S111 165,132 128 S161 76,183 93 S212 152,234 118 S264 53,292 70 L292 190 L28 190 Z" fill="var(--primary)" opacity=".12"/>
           </svg>
-          <span class="analysisLabel">MOMENTO DO JOGO</span>
+          <span class="analysisLabel">ATTACK MOMENTUM</span>
         </div>
         <div class="analysisVisual">
           <svg viewBox="0 0 320 230" role="img" aria-label="Dashboard de indicadores">
@@ -215,7 +215,7 @@ button:hover::after,button:focus-visible::after{
 <section class="workspace">
 <section class="panel players"><div class="panelTitle"><span>A equipa</span><span id="fieldCount">5/11</span></div><div class="playerTabs"><button class="active" data-player-tab="lista">Lista</button><button data-player-tab="minutos">Minutos</button></div><div class="playerList" id="playerList"></div><button class="addPlayer" id="addPlayer">＋ ADICIONAR JOGADOR</button></section>
 <section class="panel arenaPanel"><div class="tabs"><button class="active" data-arena-tab="arena">ARENA</button><button data-arena-tab="eventos">EVENTOS</button><button data-arena-tab="estatisticas">ESTATÍSTICAS</button><button data-arena-tab="jogador">JOGADOR</button><button data-arena-tab="equipa">EQUIPA</button></div><div class="fieldActions" id="fieldActions"><div class="arenaHint"><b>ARENA RÁPIDA:</b> clica no local do campo, escolhe o jogador e regista a ação.</div><div class="arenaTools"><button id="undoFieldAction">↶ Desfazer</button><button id="deleteArenaPoint">⌫ Apagar ponto</button></div></div><div class="pitchWrap" id="arenaContent"><div class="pitch" id="pitch"><div class="box left"></div><div class="box right"></div><div class="smallBox left"></div><div class="smallBox right"></div></div></div><div class="legend"><span><i></i>PASSE</span><span><i></i>PASSE LONGO</span><span><i class="dot"></i>FINALIZAÇÃO</span><span>⚽ GOLO</span><span>🛡 DESARME</span></div></section>
-<aside class="analytics"><div class="mapsPair"><section class="panel heat mapMini"><div class="panelTitle"><span>Heatmap</span><select id="heatFilter" class="miniSelect"><option value="all">Jogo</option><option value="player">Jogador</option><option value="1">1.ª parte</option><option value="2">2.ª parte</option></select></div><canvas id="heatCanvas"></canvas></section><section class="panel attackMap mapMini"><div class="panelTitle"><span>Ataques</span><select id="attackFilter" class="miniSelect"><option value="all">Jogo</option><option value="1">1.ª parte</option><option value="2">2.ª parte</option></select></div><canvas id="attackCanvas"></canvas></section></div><section class="panel quick"><div class="panelTitle"><span>Estatísticas rápidas</span><span>Ao vivo</span></div><div class="quickGrid"><div class="stat"><b>62%</b><small>Posse</small></div><div class="stat"><b>14</b><small>Remates</small></div><div class="stat"><b>7</b><small>À baliza</small></div><div class="stat"><b>324</b><small>Passes</small></div><div class="stat"><b>89%</b><small>Precisão</small></div><div class="stat"><b>1.84</b><small>xG estimado</small></div></div></section><section class="panel moment"><div class="panelTitle"><span>Momento do jogo</span><span>Intensidade</span></div><canvas id="momentCanvas"></canvas></section></aside>
+<aside class="analytics"><div class="mapsPair"><section class="panel heat mapMini"><div class="panelTitle"><span>Heatmap</span><select id="heatFilter" class="miniSelect"><option value="all">Jogo</option><option value="player">Jogador</option><option value="1">1.ª parte</option><option value="2">2.ª parte</option></select></div><canvas id="heatCanvas"></canvas></section><section class="panel attackMap mapMini"><div class="panelTitle"><span>Ataques</span><select id="attackFilter" class="miniSelect"><option value="all">Jogo</option><option value="1">1.ª parte</option><option value="2">2.ª parte</option></select></div><canvas id="attackCanvas"></canvas></section></div><section class="panel quick"><div class="panelTitle"><span>Estatísticas rápidas</span><span>Ao vivo</span></div><div class="quickGrid"><div class="stat"><b>62%</b><small>Posse</small></div><div class="stat"><b>14</b><small>Remates</small></div><div class="stat"><b>7</b><small>À baliza</small></div><div class="stat"><b>324</b><small>Passes</small></div><div class="stat"><b>89%</b><small>Precisão</small></div><div class="stat"><b>1.84</b><small>xG estimado</small></div></div></section><section class="panel moment momentumPanel"><div class="panelTitle momentumTitle"><span>Attack Momentum</span><span class="momentumDirection"><i class="momentumTeamDot home"></i>A ↑ <i class="momentumTeamDot away"></i>B ↓</span></div><div class="momentumCanvasWrap"><canvas id="momentCanvas" aria-label="Gráfico de Attack Momentum baseado na posse de bola"></canvas></div><div class="momentumLegend"><span title="Remates defendidos"><i class="momentumEventIcon save">D</i><b id="momentSaves">0</b><small>DEF.</small></span><span title="Golos"><i class="momentumEventIcon goal">⚽</i><b id="momentGoals">0</b><small>GOLOS</small></span><span title="Expulsões"><i class="momentumEventIcon red"></i><b id="momentReds">0</b><small>EXP.</small></span></div></section></aside>
 </section>
 <section class="bottom"><section class="panel timeline"><div class="panelTitle"><span>Linha do tempo</span><button id="timelineFilter" class="miniBtn">Filtros</button></div><div class="timelineTrack" id="timeline"></div></section><section class="panel summary"><div class="panelTitle"><span>Indicadores</span><span>Equipa</span></div><div class="summaryGrid"><div class="stat"><b>18</b><small>Recuperações</small></div><div class="stat"><b>11</b><small>Perdas</small></div><div class="stat"><b>6</b><small>Cantos</small></div><div class="stat"><b>4</b><small>Faltas</small></div></div></section></section>
 </main></div>
@@ -345,7 +345,7 @@ const arenaActions=[
  {key:'golo',label:'Golo',icon:'G',sub:['Golo de pé','Golo de cabeça','Livre direto','Penálti','Autogolo adversário']},
  {key:'remate',label:'Remate',icon:'◎',sub:['À baliza','Ao poste','Para fora','Bloqueado']},
  {key:'assistencia',label:'Assistência',icon:'A'},
- {key:'defesa',label:'Defesa',icon:'D'},
+ {key:'defesa',label:'Remate defendido',icon:'D'},
  {key:'recuperacao',label:'Recuperação de bola',icon:'◆'},
  {key:'perda',label:'Perda de bola',icon:'×'},
  {key:'passe',label:'Passe certo',icon:'↗'},
@@ -712,7 +712,7 @@ setTimeout(()=>{applyBrand();ensurePossession();updateAllLive();renderArenaTab('
       const duration=Math.max(0,(Date.now()-Number(p.activeSince))/1000);
       p[p.active]+=duration;
       if(duration>=.25){
-        p.log.push({team:p.active,duration:+duration.toFixed(2),time:Math.max(0,Math.floor((state.periodMinutes*60-state.seconds)/60)),period:$('#periodSelect')?.value||'1'});
+        p.log.push({team:p.active,duration:+duration.toFixed(2),elapsedSeconds:Math.max(0,state.periodMinutes*60-state.seconds),time:Math.max(0,Math.floor((state.periodMinutes*60-state.seconds)/60)),period:$('#periodSelect')?.value||'1'});
       }
     }
     if(stop){p.active=null;p.activeSince=null}else if(p.active){p.activeSince=Date.now()}
@@ -1021,6 +1021,192 @@ setTimeout(()=>{applyBrand();ensurePossession();updateAllLive();renderArenaTab('
   window.addEventListener('resize',drawBothMaps);
   configureDualMaps();
   setTimeout(()=>{configureDualMaps();drawBothMaps()},260);
+})();
+</script>
+
+
+<style id="statsvision-attack-momentum-style">
+/* Attack Momentum: barras positivas/negativas alimentadas pela posse em tempo real. */
+.analytics{grid-template-rows:minmax(0,1.03fr) .78fr minmax(128px,.94fr)!important}
+.momentumPanel{padding:0 7px 6px!important;display:grid!important;grid-template-rows:34px minmax(0,1fr) 25px!important;overflow:hidden!important}
+.momentumTitle{height:34px!important;padding:0 3px!important}
+.momentumTitle>span:first-child{font-size:10px!important;letter-spacing:.035em;text-transform:none!important;color:#101418!important}
+.momentumDirection{display:flex;align-items:center;gap:4px;color:#66717c!important;font-size:7px!important;white-space:nowrap}
+.momentumTeamDot{display:inline-block;width:7px;height:7px;border-radius:2px}.momentumTeamDot.home{background:var(--primary)}.momentumTeamDot.away{background:var(--secondary)}
+.momentumCanvasWrap{position:relative;min-height:0;overflow:hidden;border:1px solid var(--border);border-radius:9px;background:#f8fafb}
+.momentumPanel canvas{display:block!important;width:100%!important;height:100%!important;min-height:0!important}
+.momentumLegend{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;align-items:center;padding-top:4px}
+.momentumLegend>span{min-width:0;display:flex;align-items:center;justify-content:center;gap:3px;color:#66717c;font-size:6px;font-weight:900;white-space:nowrap}
+.momentumLegend b{font-size:8px;color:#101418}.momentumLegend small{font-size:6px;color:#66717c;font-weight:900}
+.momentumEventIcon{width:13px;height:13px;display:inline-grid;place-items:center;border-radius:50%;font-style:normal;font-size:7px;font-weight:950;line-height:1;background:#fff;border:1.5px solid #246bfd;color:#124fc4}
+.momentumEventIcon.goal{border:0;font-size:11px;background:transparent}.momentumEventIcon.red{width:8px;height:12px;border:1px solid #9f1239;border-radius:1px;background:#ef233c;transform:rotate(3deg)}
+@media(max-width:1100px) and (orientation:landscape){
+ .analytics{grid-template-rows:minmax(0,1fr) .72fr minmax(112px,.95fr)!important}
+ .momentumPanel{grid-template-rows:29px minmax(0,1fr) 21px!important;padding:0 4px 4px!important}
+ .momentumTitle{height:29px!important}.momentumTitle>span:first-child{font-size:8px!important}.momentumDirection{font-size:6px!important}
+ .momentumLegend>span,.momentumLegend small{font-size:5px}.momentumLegend b{font-size:7px}.momentumEventIcon{width:11px;height:11px;font-size:6px}.momentumEventIcon.goal{font-size:9px}.momentumEventIcon.red{width:7px;height:10px}
+}
+</style>
+
+<script id="statsvision-attack-momentum-script">
+(()=>{
+  const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
+  const cssColor=(name,fallback)=>getComputedStyle(document.documentElement).getPropertyValue(name).trim()||fallback;
+
+  function colorWithAlpha(color,alpha){
+    const value=String(color||'').trim();
+    if(/^#[0-9a-f]{3}$/i.test(value)){
+      const h=value.slice(1);return `rgba(${parseInt(h[0]+h[0],16)},${parseInt(h[1]+h[1],16)},${parseInt(h[2]+h[2],16)},${alpha})`;
+    }
+    if(/^#[0-9a-f]{6}$/i.test(value)){
+      return `rgba(${parseInt(value.slice(1,3),16)},${parseInt(value.slice(3,5),16)},${parseInt(value.slice(5,7),16)},${alpha})`;
+    }
+    return value;
+  }
+
+  function roundRect(ctx,x,y,w,h,r){
+    const radius=Math.max(0,Math.min(r,w/2,h/2));
+    ctx.beginPath();ctx.moveTo(x+radius,y);ctx.arcTo(x+w,y,x+w,y+h,radius);ctx.arcTo(x+w,y+h,x,y+h,radius);ctx.arcTo(x,y+h,x,y,radius);ctx.arcTo(x,y,x+w,y,radius);ctx.closePath();
+  }
+
+  function periodCount(){
+    const configured=Number(document.querySelector('#setPeriods')?.value);
+    const current=Number(document.querySelector('#periodSelect')?.value)||1;
+    return clamp(Number.isFinite(configured)&&configured>=2?configured:Math.max(2,current),2,4);
+  }
+
+  function elapsedSeconds(){
+    const duration=Math.max(1,Number(state.periodMinutes)||45)*60;
+    return clamp(duration-(Number(state.seconds)||0),0,duration);
+  }
+
+  function eventTeam(event){
+    const value=String(event?.team||event?.side||event?.club||'home').toLowerCase();
+    return /away|fora|visit|equipa b|team b/.test(value)?'away':'home';
+  }
+
+  function addSegment(home,away,start,end,team,periodSeconds,binSeconds){
+    start=clamp(Number(start)||0,0,periodSeconds*periodCount());
+    end=clamp(Number(end)||start,start,periodSeconds*periodCount());
+    if(end<=start)end=Math.min(periodSeconds*periodCount(),start+1);
+    const first=clamp(Math.floor(start/binSeconds),0,home.length-1);
+    const last=clamp(Math.floor(Math.max(start,end-.001)/binSeconds),0,home.length-1);
+    for(let index=first;index<=last;index++){
+      const binStart=index*binSeconds,binEnd=binStart+binSeconds;
+      const overlap=Math.max(0,Math.min(end,binEnd)-Math.max(start,binStart));
+      if(team==='away')away[index]+=overlap;else home[index]+=overlap;
+    }
+  }
+
+  function momentumSeries(binCount){
+    const periods=periodCount();
+    const periodSeconds=Math.max(1,Number(state.periodMinutes)||45)*60;
+    const totalSeconds=periodSeconds*periods;
+    const binSeconds=totalSeconds/binCount;
+    const home=Array(binCount).fill(0),away=Array(binCount).fill(0);
+    const logs=Array.isArray(state.possession?.log)?state.possession.log:[];
+
+    logs.forEach(log=>{
+      const period=clamp(Number(log.period)||1,1,periods);
+      const duration=Math.max(.5,Number(log.duration)||1);
+      const localEnd=clamp(Number(log.elapsedSeconds??log.gameSecond??((Number(log.time)||0)*60)),0,periodSeconds);
+      const end=(period-1)*periodSeconds+localEnd;
+      addSegment(home,away,Math.max((period-1)*periodSeconds,end-duration),end,log.team==='away'?'away':'home',periodSeconds,binSeconds);
+    });
+
+    const possession=state.possession||{};
+    if((possession.active==='home'||possession.active==='away')&&Number(possession.activeSince)){
+      const period=clamp(Number(document.querySelector('#periodSelect')?.value)||1,1,periods);
+      const duration=Math.max(0,(Date.now()-Number(possession.activeSince))/1000);
+      const end=(period-1)*periodSeconds+clamp(Math.max(elapsedSeconds(),duration),0,periodSeconds);
+      addSegment(home,away,Math.max((period-1)*periodSeconds,end-duration),end,possession.active,periodSeconds,binSeconds);
+    }
+
+    let previous=0;
+    return home.map((homeSeconds,index)=>{
+      const awaySeconds=away[index],total=homeSeconds+awaySeconds;
+      if(total<=0){previous*=.30;return {value:0,total:0};}
+      const balance=(homeSeconds-awaySeconds)/total;
+      const density=clamp(total/(binSeconds*.72),0,1);
+      const raw=balance*(.28+.72*density);
+      const value=previous*.22+raw*.78;
+      previous=value;
+      return {value:clamp(value,-1,1),total};
+    });
+  }
+
+  function drawEventMarker(ctx,event,x,y,isAway,index,width,height){
+    const action=event.action;
+    const offset=(index%3)*8;
+    const cy=clamp(isAway?y+offset:y-offset,9,height-9);
+    ctx.save();
+    if(action==='golo'){
+      ctx.font='12px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('⚽',x,cy);
+    }else if(action==='defesa'){
+      ctx.fillStyle='#fff';ctx.strokeStyle='#246bfd';ctx.lineWidth=1.6;ctx.beginPath();ctx.arc(x,cy,6,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#124fc4';ctx.font='950 7px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('D',x,cy+.3);
+    }else if(action==='expulsao'){
+      ctx.translate(x,cy);ctx.rotate(.08);ctx.fillStyle='#ef233c';ctx.strokeStyle='#9f1239';ctx.lineWidth=1;roundRect(ctx,-3.8,-6,7.6,12,1);ctx.fill();ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function renderAttackMomentum(){
+    const canvas=document.querySelector('#momentCanvas');if(!canvas)return;
+    const bounds=canvas.getBoundingClientRect();
+    const width=Math.max(1,bounds.width),height=Math.max(1,bounds.height),dpr=window.devicePixelRatio||1;
+    canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);
+    const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);
+
+    const primary=cssColor('--primary','#36c96f'),secondary=cssColor('--secondary','#246bfd');
+    const padX=4,padY=4,chartW=Math.max(1,width-padX*2),chartH=Math.max(1,height-padY*2),mid=padY+chartH/2;
+    ctx.fillStyle=colorWithAlpha(primary,.13);ctx.fillRect(padX,padY,chartW,chartH/2);
+    ctx.fillStyle=colorWithAlpha(secondary,.12);ctx.fillRect(padX,mid,chartW,chartH/2);
+
+    ctx.strokeStyle='#ffffff';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(padX,mid);ctx.lineTo(padX+chartW,mid);ctx.stroke();
+    const periods=periodCount();
+    for(let p=1;p<periods;p++){
+      const x=padX+chartW*p/periods;ctx.strokeStyle='rgba(255,255,255,.92)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,padY);ctx.lineTo(x,padY+chartH);ctx.stroke();
+    }
+
+    const binCount=clamp(Math.floor(chartW/5),28,64),series=momentumSeries(binCount);
+    const slot=chartW/binCount,gap=Math.min(1.6,slot*.24),barW=Math.max(1,slot-gap),maxH=chartH/2-7;
+    series.forEach((point,index)=>{
+      if(!point.total||Math.abs(point.value)<.015)return;
+      const x=padX+index*slot+gap/2,h=Math.max(2,Math.abs(point.value)*maxH);
+      ctx.fillStyle=point.value>=0?primary:secondary;
+      if(point.value>=0)ctx.fillRect(x,mid-h,barW,h);else ctx.fillRect(x,mid,barW,h);
+    });
+
+    const periodSeconds=Math.max(1,Number(state.periodMinutes)||45)*60,totalSeconds=periodSeconds*periods;
+    const relevant=(state.fieldEvents||[]).filter(event=>['defesa','golo','expulsao'].includes(event.action));
+    const collisions={};
+    relevant.forEach(event=>{
+      const period=clamp(Number(event.period)||1,1,periods),local=clamp((Number(event.time)||0)*60,0,periodSeconds);
+      const global=(period-1)*periodSeconds+local,x=padX+chartW*(global/totalSeconds);
+      const away=eventTeam(event)==='away',key=Math.round(x/12)+'-'+away,collision=collisions[key]||0;collisions[key]=collision+1;
+      drawEventMarker(ctx,event,clamp(x,10,width-10),away?mid+11:mid-11,away,collision,width,height);
+    });
+
+    ctx.fillStyle='#334155';ctx.font='950 7px system-ui';ctx.textAlign='left';ctx.textBaseline='top';ctx.fillText('A',padX+3,padY+2);ctx.textBaseline='bottom';ctx.fillText('B',padX+3,padY+chartH-2);
+
+    const noPossession=!series.some(point=>point.total>0);
+    if(noPossession){
+      const label='Seleciona a posse A ou B';ctx.font='850 7px system-ui';const textW=ctx.measureText(label).width;
+      ctx.fillStyle='rgba(255,255,255,.94)';roundRect(ctx,width/2-textW/2-7,mid-9,textW+14,18,6);ctx.fill();ctx.fillStyle='#66717c';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(label,width/2,mid);
+    }
+
+    const count=action=>(state.fieldEvents||[]).filter(event=>event.action===action).length;
+    const saves=document.querySelector('#momentSaves'),goals=document.querySelector('#momentGoals'),reds=document.querySelector('#momentReds');
+    if(saves)saves.textContent=count('defesa');if(goals)goals.textContent=count('golo');if(reds)reds.textContent=count('expulsao');
+  }
+
+  window.drawMoment=drawMoment=renderAttackMomentum;
+  window.addEventListener('resize',renderAttackMomentum);
+  document.querySelector('#periodSelect')?.addEventListener('change',renderAttackMomentum);
+  document.querySelector('#homeName')?.addEventListener('input',renderAttackMomentum);
+  document.querySelector('#awayName')?.addEventListener('input',renderAttackMomentum);
+  setInterval(renderAttackMomentum,400);
+  setTimeout(renderAttackMomentum,120);
 })();
 </script>
 
