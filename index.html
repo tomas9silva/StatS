@@ -572,4 +572,335 @@ setTimeout(()=>{applyBrand();ensurePossession();updateAllLive();renderArenaTab('
   });
 })();
 </script>
+
+<style id="statsvision-clean-arena-possession-lanes">
+/* Arena de inserção limpa: os pontos ficam apenas nas estatísticas e mapas individuais. */
+#deleteArenaPoint{display:none!important}
+.arenaPanel{grid-template-rows:42px 42px minmax(0,1fr) 28px!important}
+#arenaContent.pitchWrap{
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:0!important;
+  padding:2px 3px 0!important;
+}
+#arenaContent>.pitch{
+  width:min(calc(100% - 6px),520px)!important;
+  height:auto!important;
+  max-width:calc(100% - 6px)!important;
+  max-height:calc(100% - 104px)!important;
+  flex:0 0 auto!important;
+}
+@supports (width:1cqw){
+  #arenaContent>.pitch{
+    width:min(calc(100cqw - 6px),calc((100cqh - 104px) * 105 / 68))!important;
+    height:auto!important;
+  }
+}
+.arenaCleanNote{background:rgba(255,255,255,.90)!important;color:#26323c!important}
+
+/* Posse imediatamente abaixo do campo; o restante espaço do painel fica branco. */
+#arenaContent>.possessionBar{
+  width:calc(100% - 6px);
+  flex:0 0 auto;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(92px,.58fr) minmax(0,1fr);
+  gap:7px;
+  padding:7px 0 0;
+  border:0;
+  background:#fff;
+}
+.possessionBtn{
+  position:relative;
+  min-height:55px!important;
+  overflow:hidden!important;
+  isolation:isolate;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  gap:8px;
+  padding:6px 11px!important;
+  text-align:left;
+}
+.possessionBtn>span,.possessionBtn>b{position:relative;z-index:2}
+.possessionBtn span{display:grid;gap:2px;min-width:0}
+.possessionBtn strong{font-size:8px;letter-spacing:.08em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.possessionBtn small{font-size:10px;color:#66717c;font-weight:900}
+.possessionBtn b{font-size:16px!important;white-space:nowrap}
+.possessionBtn.pause{display:grid!important;grid-template-columns:1fr!important;text-align:center!important;place-items:center;padding:5px!important;border-bottom:4px solid #aab6c0!important}
+.possessionBtn.pause span{font-size:8px;font-weight:950;letter-spacing:.08em}
+.possessionBtn.pause b{font-size:8px!important;color:#66717c;white-space:normal}
+.possessionBtn.active{border-color:#246bfd!important;box-shadow:0 0 0 2px rgba(36,107,253,.16),0 7px 18px rgba(36,107,253,.12)!important}
+.possessionFill{position:absolute;z-index:0;left:0;bottom:0;height:100%;width:0;opacity:.12;pointer-events:none;transition:width .22s linear}
+.possessionBtn.home .possessionFill{background:#10c7df}
+.possessionBtn.away .possessionFill{background:#071b2b}
+.arenaBottomSpace{width:100%;min-height:18px;flex:1 1 auto;background:#fff;pointer-events:none}
+
+/* Mapa de ataques por corredor. */
+.heat .panelTitle span:first-child{white-space:nowrap}
+#heatCanvas{background:#f4f6f8!important}
+
+@media(max-width:1100px) and (orientation:landscape){
+  .arenaPanel{grid-template-rows:38px 36px minmax(0,1fr) 24px!important}
+  #arenaContent>.pitch{max-height:calc(100% - 78px)!important}
+  @supports (width:1cqw){
+    #arenaContent>.pitch{width:min(calc(100cqw - 4px),calc((100cqh - 78px) * 105 / 68))!important}
+  }
+  #arenaContent>.possessionBar{grid-template-columns:minmax(0,1fr) 76px minmax(0,1fr);gap:4px;padding-top:4px}
+  .possessionBtn{min-height:43px!important;padding:4px 7px!important}
+  .possessionBtn strong{font-size:7px}.possessionBtn small{font-size:8px}.possessionBtn b{font-size:12px!important}
+  .possessionBtn.pause span,.possessionBtn.pause b{font-size:6px!important}
+  .arenaBottomSpace{min-height:8px}
+}
+</style>
+
+<script id="statsvision-clean-arena-possession-lanes-script">
+(()=>{
+  const OFFENSIVE_ACTIONS=new Set(['passe','passe_falhado','assistencia','remate','golo','canto']);
+  let possessionInterval=null;
+  let lastPossessionPersist=0;
+
+  function normalizePossession(){
+    const previous=state.possession||{};
+    const home=Number(previous.homeSeconds??previous.home??0);
+    const away=Number(previous.awaySeconds??previous.away??0);
+    state.possession=previous;
+    state.possession.home=Number.isFinite(home)?Math.max(0,home):0;
+    state.possession.away=Number.isFinite(away)?Math.max(0,away):0;
+    state.possession.contest=0;
+    state.possession.log=Array.isArray(previous.log)?previous.log:[];
+    if(!['home','away'].includes(state.possession.active))state.possession.active=null;
+    if(!Number.isFinite(Number(state.possession.activeSince)))state.possession.activeSince=null;
+    return state.possession;
+  }
+
+  function savePossession(){
+    normalizePossession();
+    try{
+      let extra={};
+      try{extra=JSON.parse(localStorage.getItem('statsvision_extra')||'{}')||{}}catch(e){}
+      extra.brandLogo=state.brandLogo||extra.brandLogo||'';
+      extra.teamLogos=state.teamLogos||extra.teamLogos||{home:'',away:''};
+      extra.possession=state.possession;
+      localStorage.setItem('statsvision_extra',JSON.stringify(extra));
+    }catch(e){}
+  }
+
+  function currentPossessionTotals(){
+    const p=normalizePossession();
+    let home=p.home,away=p.away;
+    if(p.active&&p.activeSince){
+      const running=Math.max(0,(Date.now()-Number(p.activeSince))/1000);
+      if(p.active==='home')home+=running;else away+=running;
+    }
+    return {home,away,total:home+away};
+  }
+
+  function possessionPercentages(){
+    const totals=currentPossessionTotals();
+    if(totals.total<=0)return {...totals,homePct:50,awayPct:50};
+    const homePct=Math.round((totals.home/totals.total)*1000)/10;
+    return {...totals,homePct,awayPct:Math.round((100-homePct)*10)/10};
+  }
+
+  function possessionClock(seconds){
+    const total=Math.max(0,Math.floor(seconds));
+    return String(Math.floor(total/60)).padStart(2,'0')+':'+String(total%60).padStart(2,'0');
+  }
+
+  function commitPossession(stop=true){
+    const p=normalizePossession();
+    if(p.active&&p.activeSince){
+      const duration=Math.max(0,(Date.now()-Number(p.activeSince))/1000);
+      p[p.active]+=duration;
+      if(duration>=.25){
+        p.log.push({team:p.active,duration:+duration.toFixed(2),time:Math.max(0,Math.floor((state.periodMinutes*60-state.seconds)/60)),period:$('#periodSelect')?.value||'1'});
+      }
+    }
+    if(stop){p.active=null;p.activeSince=null}else if(p.active){p.activeSince=Date.now()}
+    savePossession();
+  }
+
+  function startPossession(team){
+    const p=normalizePossession();
+    if(p.active===team){toast((team==='home'?'Equipa A':'Equipa B')+' já está a contar');return}
+    commitPossession(true);
+    p.active=team;
+    p.activeSince=Date.now();
+    savePossession();
+    refreshPossession();
+  }
+
+  function pausePossession(showToast=true){
+    const p=normalizePossession();
+    const wasActive=Boolean(p.active);
+    commitPossession(true);
+    refreshPossession();
+    if(showToast&&wasActive)toast('Contagem da posse pausada');
+  }
+
+  function mountPossession(){
+    const wrap=$('#arenaContent');
+    if(!wrap||state.arenaTab!=='arena'||!wrap.querySelector('#pitch'))return;
+    let bar=$('#possessionBar');
+    if(bar&&bar.parentElement!==wrap){bar.remove();bar=null}
+    if(!bar){
+      bar=document.createElement('div');
+      bar.className='possessionBar';
+      bar.id='possessionBar';
+      bar.innerHTML=`
+        <button class="possessionBtn home" type="button" data-live-possession="home">
+          <i class="possessionFill" id="posHomeFill"></i>
+          <span><strong id="posHomeName">EQUIPA A</strong><small id="posHomeTime">00:00</small></span><b id="posHome">50%</b>
+        </button>
+        <button class="possessionBtn pause" type="button" data-live-possession="pause"><span>PAUSAR POSSE</span><b id="posStatus">SEM CONTAGEM</b></button>
+        <button class="possessionBtn away" type="button" data-live-possession="away">
+          <i class="possessionFill" id="posAwayFill"></i>
+          <span><strong id="posAwayName">EQUIPA B</strong><small id="posAwayTime">00:00</small></span><b id="posAway">50%</b>
+        </button>`;
+      bar.onclick=event=>{
+        const button=event.target.closest('[data-live-possession]');
+        if(!button)return;
+        const team=button.dataset.livePossession;
+        team==='pause'?pausePossession():startPossession(team);
+      };
+    }
+    const pitch=wrap.querySelector('#pitch');
+    pitch.insertAdjacentElement('afterend',bar);
+    let spacer=wrap.querySelector('.arenaBottomSpace');
+    if(!spacer){spacer=document.createElement('div');spacer.className='arenaBottomSpace';wrap.appendChild(spacer)}
+    refreshPossession();
+  }
+
+  function refreshPossession(){
+    normalizePossession();
+    if(state.arenaTab==='arena'&&!$('#possessionBar'))mountPossession();
+    const values=possessionPercentages(),p=state.possession;
+    const homeName=($('#homeName')?.value||'Equipa A').trim();
+    const awayName=($('#awayName')?.value||'Equipa B').trim();
+    if($('#posHomeName'))$('#posHomeName').textContent='A · '+homeName;
+    if($('#posAwayName'))$('#posAwayName').textContent='B · '+awayName;
+    if($('#posHomeTime'))$('#posHomeTime').textContent=possessionClock(values.home);
+    if($('#posAwayTime'))$('#posAwayTime').textContent=possessionClock(values.away);
+    if($('#posHome'))$('#posHome').textContent=values.homePct.toFixed(1)+'%';
+    if($('#posAway'))$('#posAway').textContent=values.awayPct.toFixed(1)+'%';
+    if($('#posHomeFill'))$('#posHomeFill').style.width=values.homePct+'%';
+    if($('#posAwayFill'))$('#posAwayFill').style.width=values.awayPct+'%';
+    $$('.possessionBtn[data-live-possession]').forEach(button=>button.classList.toggle('active',button.dataset.livePossession===p.active));
+    if($('#posStatus'))$('#posStatus').textContent=p.active==='home'?'A A CONTAR':p.active==='away'?'B A CONTAR':'SEM CONTAGEM';
+    const quick=$('.quickGrid .stat:first-child');
+    if(quick){const b=quick.querySelector('b'),small=quick.querySelector('small');if(b)b.textContent=values.homePct.toFixed(1)+'%';if(small)small.textContent='Posse equipa A'}
+    if(Date.now()-lastPossessionPersist>5000){lastPossessionPersist=Date.now();savePossession()}
+  }
+
+  /* O campo principal mostra apenas o ponto temporário enquanto a ação está a ser escolhida. */
+  const cleanFieldRenderer=function(){
+    const pitch=$('#pitch');if(!pitch)return;
+    pitch.querySelectorAll('.fieldPoint,.flowPoint,.arenaCleanNote').forEach(element=>element.remove());
+    const note=document.createElement('div');
+    note.className='arenaCleanNote';
+    note.textContent='Clica no campo para registar uma ação';
+    pitch.appendChild(note);
+  };
+  window.renderFieldEvents=renderFieldEvents=cleanFieldRenderer;
+
+  function laneForEvent(event){
+    const y=Math.max(0,Math.min(100,Number(event.y)||0));
+    if(y>=33.333&&y<=66.667)return 'center';
+    const top=y<33.333;
+    const attackSide=event.attackSide||state.attackSide||'right';
+    if(attackSide==='right')return top?'left':'right';
+    return top?'right':'left';
+  }
+
+  function roundedRect(ctx,x,y,w,h,r){
+    const radius=Math.min(r,w/2,h/2);
+    ctx.beginPath();ctx.moveTo(x+radius,y);ctx.arcTo(x+w,y,x+w,y+h,radius);ctx.arcTo(x+w,y+h,x,y+h,radius);ctx.arcTo(x,y+h,x,y,radius);ctx.arcTo(x,y,x+w,y,radius);ctx.closePath();
+  }
+
+  const attackLaneRenderer=function(){
+    const canvas=$('#heatCanvas');if(!canvas)return;
+    const bounds=canvas.getBoundingClientRect(),d=window.devicePixelRatio||1;
+    const width=Math.max(1,bounds.width),height=Math.max(1,bounds.height);
+    canvas.width=Math.round(width*d);canvas.height=Math.round(height*d);
+    const ctx=canvas.getContext('2d');ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,width,height);
+    const pad=8,fw=width-pad*2,fh=height-pad*2;
+    roundedRect(ctx,pad,pad,fw,fh,8);ctx.fillStyle='#4ba64a';ctx.fill();ctx.save();roundedRect(ctx,pad,pad,fw,fh,8);ctx.clip();
+    for(let i=0;i<10;i++){ctx.fillStyle=i%2?'rgba(255,255,255,.035)':'rgba(0,0,0,.025)';ctx.fillRect(pad+i*fw/10,pad,fw/10,fh)}
+    ctx.fillStyle='rgba(255,255,255,.075)';ctx.fillRect(pad,pad,fw,fh/3);ctx.fillRect(pad,pad+2*fh/3,fw,fh/3);
+    ctx.strokeStyle='rgba(255,255,255,.92)';ctx.lineWidth=1.5;ctx.strokeRect(pad+1,pad+1,fw-2,fh-2);
+    ctx.beginPath();ctx.moveTo(pad+fw/2,pad);ctx.lineTo(pad+fw/2,pad+fh);ctx.stroke();
+    ctx.beginPath();ctx.arc(pad+fw/2,pad+fh/2,Math.min(fw,fh)*.15,0,Math.PI*2);ctx.stroke();
+    ctx.strokeRect(pad,pad+fh*.22,fw*.17,fh*.56);ctx.strokeRect(pad+fw*.83,pad+fh*.22,fw*.17,fh*.56);
+    ctx.setLineDash([4,4]);ctx.strokeStyle='rgba(255,255,255,.48)';
+    [1/3,2/3].forEach(part=>{ctx.beginPath();ctx.moveTo(pad,pad+fh*part);ctx.lineTo(pad+fw,pad+fh*part);ctx.stroke()});ctx.setLineDash([]);
+
+    const filter=$('#heatFilter')?.value||'all';
+    const events=(state.fieldEvents||[]).filter(event=>OFFENSIVE_ACTIONS.has(event.action)&&(filter==='all'||String(event.period)===String(filter)));
+    const counts={left:0,center:0,right:0};events.forEach(event=>counts[laneForEvent(event)]++);
+    const max=Math.max(1,counts.left,counts.center,counts.right);
+    const lanes=[['left','ESQUERDA'],['center','MEIO'],['right','DIREITA']];
+    const attackRight=(state.attackSide||'right')==='right';
+    const barMax=fw*.54,barHeight=Math.max(11,Math.min(20,fh*.105));
+    lanes.forEach(([key,label],index)=>{
+      const cy=pad+fh*((index+.5)/3),amount=counts[key],barWidth=barMax*(amount/max);
+      const start=attackRight?pad+fw*.18:pad+fw*.82;
+      ctx.fillStyle='rgba(7,27,43,.24)';
+      const bgX=attackRight?start:start-barMax;roundedRect(ctx,bgX,cy-barHeight/2,barMax,barHeight,barHeight/2);ctx.fill();
+      if(amount>0){
+        const x=attackRight?start:start-barWidth;
+        const gradient=ctx.createLinearGradient(attackRight?x:x+barWidth,0,attackRight?x+barWidth:x,0);gradient.addColorStop(0,'#10c7df');gradient.addColorStop(1,'#246bfd');
+        ctx.fillStyle=gradient;roundedRect(ctx,x,cy-barHeight/2,Math.max(4,barWidth),barHeight,barHeight/2);ctx.fill();
+      }
+      const pillW=Math.min(92,fw*.27),pillH=Math.max(18,barHeight+5),pillX=attackRight?pad+6:pad+fw-pillW-6;
+      ctx.fillStyle='rgba(255,255,255,.91)';roundedRect(ctx,pillX,cy-pillH/2,pillW,pillH,7);ctx.fill();
+      ctx.fillStyle='#101418';ctx.font=`900 ${Math.max(7,Math.min(10,width*.034))}px system-ui`;ctx.textBaseline='middle';ctx.textAlign='left';ctx.fillText(label,pillX+7,cy);
+      ctx.textAlign='right';ctx.font=`950 ${Math.max(9,Math.min(13,width*.043))}px system-ui`;ctx.fillText(String(amount),pillX+pillW-7,cy);
+    });
+    ctx.restore();
+    if(!events.length){
+      ctx.fillStyle='rgba(255,255,255,.94)';roundedRect(ctx,width/2-78,height/2-16,156,32,9);ctx.fill();
+      ctx.fillStyle='#52616d';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='850 9px system-ui';ctx.fillText('Sem ataques registados',width/2,height/2);
+    }
+  };
+  window.drawHeat=drawHeat=attackLaneRenderer;
+
+  function configureAttackPanel(){
+    const title=$('.heat .panelTitle span:first-child'),filter=$('#heatFilter');
+    if(title)title.textContent='Ataques por corredor';
+    if(filter){
+      const current=['all','1','2'].includes(filter.value)?filter.value:'all';
+      filter.innerHTML='<option value="all">Jogo completo</option><option value="1">1.ª parte</option><option value="2">2.ª parte</option>';
+      filter.value=current;
+      filter.onchange=()=>{drawHeat();toast('Ataques: '+filter.options[filter.selectedIndex].text)};
+    }
+    drawHeat();
+  }
+
+  const previousArenaRenderer=window.renderArenaTab;
+  window.renderArenaTab=renderArenaTab=function(tab){
+    previousArenaRenderer(tab);
+    if(tab==='arena'){
+      cleanFieldRenderer();
+      mountPossession();
+    }else{
+      const outsideBar=$('body>#possessionBar');if(outsideBar)outsideBar.remove();
+    }
+    drawHeat();
+  };
+
+  $('#periodSelect')?.addEventListener('change',()=>pausePossession(false));
+  $('#homeName')?.addEventListener('input',refreshPossession);
+  $('#awayName')?.addEventListener('input',refreshPossession);
+  window.addEventListener('beforeunload',()=>pausePossession(false));
+
+  const hint=$('.arenaHint');if(hint)hint.innerHTML='<b>ARENA RÁPIDA:</b> seleciona o local, o jogador e a ação. Depois do registo, o campo volta a ficar limpo.';
+  normalizePossession();
+  configureAttackPanel();
+  cleanFieldRenderer();
+  mountPossession();
+  if(possessionInterval)clearInterval(possessionInterval);
+  possessionInterval=setInterval(refreshPossession,250);
+  setTimeout(()=>{configureAttackPanel();mountPossession();refreshPossession()},180);
+})();
+</script>
+
 </body></html>
