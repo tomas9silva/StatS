@@ -215,7 +215,7 @@ button:hover::after,button:focus-visible::after{
 <section class="workspace">
 <section class="panel players"><div class="panelTitle"><span>A equipa</span><span id="fieldCount">5/11</span></div><div class="playerTabs"><button class="active" data-player-tab="lista">Lista</button><button data-player-tab="minutos">Minutos</button></div><div class="playerList" id="playerList"></div><button class="addPlayer" id="addPlayer">＋ ADICIONAR JOGADOR</button></section>
 <section class="panel arenaPanel"><div class="tabs"><button class="active" data-arena-tab="arena">ARENA</button><button data-arena-tab="eventos">EVENTOS</button><button data-arena-tab="estatisticas">ESTATÍSTICAS</button><button data-arena-tab="jogador">JOGADOR</button><button data-arena-tab="equipa">EQUIPA</button></div><div class="fieldActions" id="fieldActions"><div class="arenaHint"><b>ARENA RÁPIDA:</b> clica no local do campo, escolhe o jogador e regista a ação.</div><div class="arenaTools"><button id="undoFieldAction">↶ Desfazer</button><button id="deleteArenaPoint">⌫ Apagar ponto</button></div></div><div class="pitchWrap" id="arenaContent"><div class="pitch" id="pitch"><div class="box left"></div><div class="box right"></div><div class="smallBox left"></div><div class="smallBox right"></div></div></div><div class="legend"><span><i></i>PASSE</span><span><i></i>PASSE LONGO</span><span><i class="dot"></i>FINALIZAÇÃO</span><span>⚽ GOLO</span><span>🛡 DESARME</span></div></section>
-<aside class="analytics"><section class="panel heat"><div class="panelTitle"><span>Heatmap</span><select id="heatFilter" class="miniSelect"><option value="todos">Todos</option><option value="equipa">Equipa</option><option value="jogador">Jogador</option><option value="1p">1.º período</option><option value="2p">2.º período</option></select></div><canvas id="heatCanvas"></canvas></section><section class="panel quick"><div class="panelTitle"><span>Estatísticas rápidas</span><span>Ao vivo</span></div><div class="quickGrid"><div class="stat"><b>62%</b><small>Posse</small></div><div class="stat"><b>14</b><small>Remates</small></div><div class="stat"><b>7</b><small>À baliza</small></div><div class="stat"><b>324</b><small>Passes</small></div><div class="stat"><b>89%</b><small>Precisão</small></div><div class="stat"><b>1.84</b><small>xG estimado</small></div></div></section><section class="panel moment"><div class="panelTitle"><span>Momento do jogo</span><span>Intensidade</span></div><canvas id="momentCanvas"></canvas></section></aside>
+<aside class="analytics"><div class="mapsPair"><section class="panel heat mapMini"><div class="panelTitle"><span>Heatmap</span><select id="heatFilter" class="miniSelect"><option value="all">Jogo</option><option value="player">Jogador</option><option value="1">1.ª parte</option><option value="2">2.ª parte</option></select></div><canvas id="heatCanvas"></canvas></section><section class="panel attackMap mapMini"><div class="panelTitle"><span>Ataques</span><select id="attackFilter" class="miniSelect"><option value="all">Jogo</option><option value="1">1.ª parte</option><option value="2">2.ª parte</option></select></div><canvas id="attackCanvas"></canvas></section></div><section class="panel quick"><div class="panelTitle"><span>Estatísticas rápidas</span><span>Ao vivo</span></div><div class="quickGrid"><div class="stat"><b>62%</b><small>Posse</small></div><div class="stat"><b>14</b><small>Remates</small></div><div class="stat"><b>7</b><small>À baliza</small></div><div class="stat"><b>324</b><small>Passes</small></div><div class="stat"><b>89%</b><small>Precisão</small></div><div class="stat"><b>1.84</b><small>xG estimado</small></div></div></section><section class="panel moment"><div class="panelTitle"><span>Momento do jogo</span><span>Intensidade</span></div><canvas id="momentCanvas"></canvas></section></aside>
 </section>
 <section class="bottom"><section class="panel timeline"><div class="panelTitle"><span>Linha do tempo</span><button id="timelineFilter" class="miniBtn">Filtros</button></div><div class="timelineTrack" id="timeline"></div></section><section class="panel summary"><div class="panelTitle"><span>Indicadores</span><span>Equipa</span></div><div class="summaryGrid"><div class="stat"><b>18</b><small>Recuperações</small></div><div class="stat"><b>11</b><small>Perdas</small></div><div class="stat"><b>6</b><small>Cantos</small></div><div class="stat"><b>4</b><small>Faltas</small></div></div></section></section>
 </main></div>
@@ -900,6 +900,127 @@ setTimeout(()=>{applyBrand();ensurePossession();updateAllLive();renderArenaTab('
   if(possessionInterval)clearInterval(possessionInterval);
   possessionInterval=setInterval(refreshPossession,250);
   setTimeout(()=>{configureAttackPanel();mountPossession();refreshPossession()},180);
+})();
+</script>
+
+<style id="statsvision-dual-maps-style">
+/* Heatmap e ataques por corredor lado a lado. */
+.analytics{grid-template-rows:minmax(0,1.12fr) .85fr .65fr!important}
+.mapsPair{min-width:0;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.mapMini{min-width:0;min-height:0;display:flex!important;flex-direction:column!important;overflow:hidden!important;padding:0 6px 6px!important}
+.mapMini .panelTitle{flex:0 0 38px;width:100%;padding:0 3px!important;gap:4px}
+.mapMini .panelTitle span{font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mapMini .miniSelect{max-width:72px;min-width:0;padding:3px 4px!important;font-size:7px!important}
+.mapMini canvas{display:block!important;width:100%!important;height:auto!important;max-width:none!important;max-height:calc(100% - 2px)!important;aspect-ratio:105/68!important;margin:auto!important;flex:0 1 auto!important;border-radius:8px!important;background:#f4f6f8!important}
+@media(max-width:1100px) and (orientation:landscape){
+  .mapsPair{gap:5px}
+  .mapMini{padding:0 3px 3px!important}
+  .mapMini .panelTitle{height:31px!important;flex-basis:31px!important}
+  .mapMini .panelTitle span{font-size:7px}
+  .mapMini .miniSelect{max-width:54px;font-size:6px!important;padding:2px!important}
+}
+</style>
+
+<script id="statsvision-dual-maps-script">
+(()=>{
+  const OFFENSIVE_ACTIONS_DUAL=new Set(['passe','passe_falhado','assistencia','remate','golo','canto']);
+
+  function setupCanvas(canvas){
+    const bounds=canvas.getBoundingClientRect(),d=window.devicePixelRatio||1;
+    const width=Math.max(1,bounds.width),height=Math.max(1,bounds.height);
+    canvas.width=Math.round(width*d);canvas.height=Math.round(height*d);
+    const ctx=canvas.getContext('2d');ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,width,height);
+    return {ctx,width,height};
+  }
+  function roundRect(ctx,x,y,w,h,r){
+    const radius=Math.max(0,Math.min(r,w/2,h/2));
+    ctx.beginPath();ctx.moveTo(x+radius,y);ctx.arcTo(x+w,y,x+w,y+h,radius);ctx.arcTo(x+w,y+h,x,y+h,radius);ctx.arcTo(x,y+h,x,y,radius);ctx.arcTo(x,y,x+w,y,radius);ctx.closePath();
+  }
+  function drawPitch(ctx,width,height){
+    const pad=6,fw=width-pad*2,fh=height-pad*2;
+    roundRect(ctx,pad,pad,fw,fh,7);ctx.fillStyle='#4ba64a';ctx.fill();ctx.save();roundRect(ctx,pad,pad,fw,fh,7);ctx.clip();
+    for(let i=0;i<10;i++){ctx.fillStyle=i%2?'rgba(255,255,255,.035)':'rgba(0,0,0,.025)';ctx.fillRect(pad+i*fw/10,pad,fw/10,fh)}
+    ctx.strokeStyle='rgba(255,255,255,.92)';ctx.lineWidth=1.2;ctx.strokeRect(pad+1,pad+1,fw-2,fh-2);
+    ctx.beginPath();ctx.moveTo(pad+fw/2,pad);ctx.lineTo(pad+fw/2,pad+fh);ctx.stroke();
+    ctx.beginPath();ctx.arc(pad+fw/2,pad+fh/2,Math.min(fw,fh)*.15,0,Math.PI*2);ctx.stroke();
+    ctx.strokeRect(pad,pad+fh*.22,fw*.17,fh*.56);ctx.strokeRect(pad+fw*.83,pad+fh*.22,fw*.17,fh*.56);
+    ctx.restore();
+    return {pad,fw,fh};
+  }
+  function filteredHeatEvents(){
+    const filter=$('#heatFilter')?.value||'all';
+    const selected=state.players?.[state.selectedPlayer];
+    return (state.fieldEvents||[]).filter(event=>{
+      if(filter==='1'||filter==='2')return String(event.period)===filter;
+      if(filter==='player')return selected&&String(event.playerNumber)===String(selected.number);
+      return true;
+    });
+  }
+  function drawRealHeat(){
+    const canvas=$('#heatCanvas');if(!canvas)return;
+    const {ctx,width,height}=setupCanvas(canvas),field=drawPitch(ctx,width,height);
+    const events=filteredHeatEvents();
+    events.forEach(event=>{
+      const gx=field.pad+field.fw*Math.max(0,Math.min(100,Number(event.x)||0))/100;
+      const gy=field.pad+field.fh*Math.max(0,Math.min(100,Number(event.y)||0))/100;
+      const importance=['golo','remate'].includes(event.action)?1.25:1;
+      const radius=Math.max(13,width*.12)*importance;
+      const gradient=ctx.createRadialGradient(gx,gy,0,gx,gy,radius);
+      gradient.addColorStop(0,'rgba(255,45,45,.84)');gradient.addColorStop(.30,'rgba(255,215,0,.68)');gradient.addColorStop(.62,'rgba(16,199,223,.34)');gradient.addColorStop(1,'rgba(16,199,223,0)');
+      ctx.fillStyle=gradient;ctx.fillRect(gx-radius,gy-radius,radius*2,radius*2);
+    });
+    if(!events.length){
+      ctx.fillStyle='rgba(255,255,255,.94)';roundRect(ctx,width/2-Math.min(62,width*.38),height/2-12,Math.min(124,width*.76),24,7);ctx.fill();
+      ctx.fillStyle='#52616d';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`850 ${Math.max(6,Math.min(9,width*.055))}px system-ui`;ctx.fillText('Sem ações',width/2,height/2);
+    }
+  }
+  function laneForDual(event){
+    const y=Math.max(0,Math.min(100,Number(event.y)||0));
+    if(y>=33.333&&y<=66.667)return 'center';
+    const top=y<33.333,side=event.attackSide||state.attackSide||'right';
+    return side==='right'?(top?'left':'right'):(top?'right':'left');
+  }
+  function drawAttackLanes(){
+    const canvas=$('#attackCanvas');if(!canvas)return;
+    const {ctx,width,height}=setupCanvas(canvas),field=drawPitch(ctx,width,height);
+    ctx.setLineDash([3,3]);ctx.strokeStyle='rgba(255,255,255,.48)';
+    [1/3,2/3].forEach(part=>{ctx.beginPath();ctx.moveTo(field.pad,field.pad+field.fh*part);ctx.lineTo(field.pad+field.fw,field.pad+field.fh*part);ctx.stroke()});ctx.setLineDash([]);
+    const filter=$('#attackFilter')?.value||'all';
+    const events=(state.fieldEvents||[]).filter(event=>OFFENSIVE_ACTIONS_DUAL.has(event.action)&&(filter==='all'||String(event.period)===filter));
+    const counts={left:0,center:0,right:0};events.forEach(event=>counts[laneForDual(event)]++);
+    const max=Math.max(1,counts.left,counts.center,counts.right),lanes=[['left','E'],['center','M'],['right','D']];
+    const attackRight=(state.attackSide||'right')==='right',barMax=field.fw*.48,barHeight=Math.max(7,Math.min(13,field.fh*.10));
+    lanes.forEach(([key,label],index)=>{
+      const cy=field.pad+field.fh*((index+.5)/3),amount=counts[key],barWidth=barMax*(amount/max),start=attackRight?field.pad+field.fw*.24:field.pad+field.fw*.76;
+      ctx.fillStyle='rgba(7,27,43,.24)';roundRect(ctx,attackRight?start:start-barMax,cy-barHeight/2,barMax,barHeight,barHeight/2);ctx.fill();
+      if(amount){const x=attackRight?start:start-barWidth,g=ctx.createLinearGradient(attackRight?x:x+barWidth,0,attackRight?x+barWidth:x,0);g.addColorStop(0,'#10c7df');g.addColorStop(1,'#246bfd');ctx.fillStyle=g;roundRect(ctx,x,cy-barHeight/2,Math.max(3,barWidth),barHeight,barHeight/2);ctx.fill()}
+      const size=Math.max(15,Math.min(23,width*.18)),px=attackRight?field.pad+3:field.pad+field.fw-size-3;
+      ctx.fillStyle='rgba(255,255,255,.93)';roundRect(ctx,px,cy-size/2,size,size,6);ctx.fill();ctx.fillStyle='#101418';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`950 ${Math.max(7,Math.min(11,width*.065))}px system-ui`;ctx.fillText(label+amount,px+size/2,cy);
+    });
+  }
+  function configureDualMaps(){
+    const heatTitle=$('.heat .panelTitle span:first-child'),attackTitle=$('.attackMap .panelTitle span:first-child');
+    const heatFilter=$('#heatFilter'),attackFilter=$('#attackFilter');
+    if(heatTitle)heatTitle.textContent='Heatmap';
+    if(attackTitle)attackTitle.textContent='Ataques';
+    if(heatFilter){
+      const value=['all','player','1','2'].includes(heatFilter.value)?heatFilter.value:'all';
+      heatFilter.innerHTML='<option value="all">Jogo</option><option value="player">Jogador</option><option value="1">1.ª parte</option><option value="2">2.ª parte</option>';
+      heatFilter.value=value;heatFilter.onchange=null;
+    }
+    if(attackFilter){
+      const value=['all','1','2'].includes(attackFilter.value)?attackFilter.value:'all';
+      attackFilter.innerHTML='<option value="all">Jogo</option><option value="1">1.ª parte</option><option value="2">2.ª parte</option>';
+      attackFilter.value=value;
+    }
+  }
+  function drawBothMaps(){drawRealHeat();drawAttackLanes()}
+  window.drawHeat=drawHeat=drawBothMaps;
+  $('#heatFilter')?.addEventListener('change',()=>{drawRealHeat();toast('Heatmap atualizado')});
+  $('#attackFilter')?.addEventListener('change',()=>{drawAttackLanes();toast('Ataques por corredor atualizados')});
+  window.addEventListener('resize',drawBothMaps);
+  configureDualMaps();
+  setTimeout(()=>{configureDualMaps();drawBothMaps()},260);
 })();
 </script>
 
