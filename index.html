@@ -3050,64 +3050,73 @@ button:hover,button:focus-visible{transform:none!important;filter:none!important
 
 <style id="statsvision-analysis-center-main-scroll-v31">
 /* V31 — correção apenas na página principal; a ampliação mantém o comportamento anterior. */
-#arenaContent.hasAnalysisCenter>.analysisCenter{
+#analysisCenter{
   overflow:hidden!important;
 }
-#arenaContent.hasAnalysisCenter>.analysisCenter>.analysisCenterBody{
+#analysisCenter>.analysisCenterBody{
   width:100%!important;
   height:100%!important;
   min-width:0!important;
   min-height:0!important;
   overflow-x:hidden!important;
   overflow-y:auto!important;
-  display:block!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
   overscroll-behavior:contain;
   scrollbar-gutter:stable;
 }
-#arenaContent.hasAnalysisCenter .analysisCenterBody>div{
+#analysisCenter>.analysisCenterBody>div{
   width:100%!important;
-  height:100%!important;
+  height:auto!important;
   min-width:0!important;
-  min-height:100%!important;
+  min-height:0!important;
+  flex:1 0 auto!important;
+  align-self:stretch!important;
   margin:0!important;
 }
-#arenaContent.hasAnalysisCenter .liveSummaryGrid{
+#analysisCenter .liveSummaryGrid{
   display:grid!important;
   grid-template-columns:repeat(3,minmax(0,1fr))!important;
   grid-template-rows:auto!important;
   align-items:stretch!important;
-  height:100%!important;
-  min-height:100%!important;
+  height:auto!important;
+  min-height:0!important;
   align-content:stretch!important;
 }
-#arenaContent.hasAnalysisCenter .liveSummaryCard{
+#analysisCenter .liveSummaryCard{
   width:100%!important;
-  height:100%!important;
-  min-height:100%!important;
+  height:auto!important;
+  min-height:0!important;
   align-self:stretch!important;
   overflow:visible!important;
 }
-#arenaContent.hasAnalysisCenter .liveSummaryCard p,
-#arenaContent.hasAnalysisCenter .liveSummaryItems{
+#analysisCenter .liveSummaryCard p,
+#analysisCenter .liveSummaryItems{
   min-height:0!important;
   overflow:visible!important;
 }
-#arenaContent.hasAnalysisCenter .analysisOverviewGrid,
-#arenaContent.hasAnalysisCenter .analysisPane,
-#arenaContent.hasAnalysisCenter .patternCards,
-#arenaContent.hasAnalysisCenter .alertPane{
+#analysisCenter .analysisOverviewGrid,
+#analysisCenter .analysisPane,
+#analysisCenter .patternCards,
+#analysisCenter .alertPane{
   width:100%!important;
-  height:100%!important;
+  height:auto!important;
   min-width:0!important;
-  min-height:100%!important;
+  min-height:0!important;
+  flex:1 0 auto!important;
+  align-content:stretch!important;
   overflow:visible!important;
 }
-#arenaContent.hasAnalysisCenter .analysisMini,
-#arenaContent.hasAnalysisCenter .zoneLargeCard,
-#arenaContent.hasAnalysisCenter .analysisListCard,
-#arenaContent.hasAnalysisCenter .riskGaugeCard,
-#arenaContent.hasAnalysisCenter .alertList,
-#arenaContent.hasAnalysisCenter .patternCard{
+#analysisCenter .analysisOverviewGrid{
+  grid-template-rows:auto!important;
+}
+#analysisCenter .analysisMini,
+#analysisCenter .zoneLargeCard,
+#analysisCenter .analysisListCard,
+#analysisCenter .riskGaugeCard,
+#analysisCenter .alertList,
+#analysisCenter .patternCard{
   height:auto!important;
   min-height:0!important;
   overflow:visible!important;
