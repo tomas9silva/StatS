@@ -2635,10 +2635,10 @@ button:hover,button:focus-visible{transform:none!important;filter:none!important
   position:relative!important;
   min-height:0!important;
   overflow:hidden!important;
-  border:1px solid #1d2a38!important;
+  border:1px solid #d8dee4!important;
   border-radius:9px!important;
-  background:#0b121b!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 3px 9px rgba(15,23,42,.10)!important;
+  background:#fff!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.75),0 3px 9px rgba(15,23,42,.07)!important;
 }
 .momentumPanel canvas{display:block!important;width:100%!important;height:100%!important;min-height:0!important}
 .momentumLegend{display:none!important}
@@ -2790,7 +2790,7 @@ button:hover,button:focus-visible{transform:none!important;filter:none!important
     const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);
 
     const homeColor=css('--primary','#36c96f'),awayColor=css('--secondary','#246bfd');
-    const bgTop='#0e1722',bgBottom='#081019';
+    const bgTop='#ffffff',bgBottom='#f7f9fb';
     const left=clamp(width*.10,25,42),right=clamp(width*.18,48,74),top=9,bottom=17;
     const chartX=left,chartY=top,chartW=Math.max(1,width-left-right),chartH=Math.max(1,height-top-bottom),mid=chartY+chartH/2;
     const series=buildForexSeries(),points=series.points,periods=periodsCount();
@@ -2802,17 +2802,17 @@ button:hover,button:focus-visible{transform:none!important;filter:none!important
     ctx.lineWidth=1;
     for(let row=0;row<=4;row++){
       const y=chartY+chartH*row/4;
-      ctx.strokeStyle=row===2?'rgba(255,255,255,.23)':'rgba(255,255,255,.075)';
+      ctx.strokeStyle=row===2?'rgba(16,20,24,.22)':'rgba(16,20,24,.075)';
       ctx.setLineDash(row===2?[4,4]:[]);ctx.beginPath();ctx.moveTo(chartX,y);ctx.lineTo(chartX+chartW,y);ctx.stroke();
     }
     ctx.setLineDash([]);
     for(let period=0;period<=periods;period++){
       const x=chartX+chartW*period/periods;
-      ctx.strokeStyle=period===0||period===periods?'rgba(255,255,255,.12)':'rgba(255,255,255,.18)';
+      ctx.strokeStyle=period===0||period===periods?'rgba(16,20,24,.11)':'rgba(16,20,24,.16)';
       ctx.beginPath();ctx.moveTo(x,chartY);ctx.lineTo(x,chartY+chartH);ctx.stroke();
       if(period<periods){
         const half=x+chartW/(periods*2);
-        ctx.strokeStyle='rgba(255,255,255,.045)';ctx.beginPath();ctx.moveTo(half,chartY);ctx.lineTo(half,chartY+chartH);ctx.stroke();
+        ctx.strokeStyle='rgba(16,20,24,.045)';ctx.beginPath();ctx.moveTo(half,chartY);ctx.lineTo(half,chartY+chartH);ctx.stroke();
       }
     }
 
@@ -2824,9 +2824,9 @@ button:hover,button:focus-visible{transform:none!important;filter:none!important
     ctx.font=`900 ${clamp(width/53,6.5,9)}px system-ui`;ctx.textAlign='left';ctx.textBaseline='middle';
     ctx.fillStyle=homeColor;ctx.fillText(shortName('home'),4,chartY+8);
     ctx.fillStyle=awayColor;ctx.fillText(shortName('away'),4,chartY+chartH-8);
-    ctx.fillStyle='rgba(255,255,255,.42)';ctx.font=`800 ${clamp(width/66,5.5,7.5)}px system-ui`;ctx.fillText('EQUILÍBRIO',4,mid);
+    ctx.fillStyle='rgba(16,20,24,.46)';ctx.font=`800 ${clamp(width/66,5.5,7.5)}px system-ui`;ctx.fillText('EQUILÍBRIO',4,mid);
 
-    ctx.textAlign='center';ctx.textBaseline='top';ctx.fillStyle='rgba(255,255,255,.42)';
+    ctx.textAlign='center';ctx.textBaseline='top';ctx.fillStyle='rgba(16,20,24,.46)';
     const periodMin=Math.max(1,Number(state.periodMinutes)||45);
     for(let period=0;period<=periods;period++){
       const x=chartX+chartW*period/periods;
@@ -2850,7 +2850,7 @@ button:hover,button:focus-visible{transform:none!important;filter:none!important
       ctx.lineCap='round';ctx.lineJoin='round';
       for(let index=1;index<points.length;index++){
         const a=points[index-1],b=points[index];
-        const color=b.team==='home'?homeColor:b.team==='away'?awayColor:'rgba(255,255,255,.30)';
+        const color=b.team==='home'?homeColor:b.team==='away'?awayColor:'rgba(16,20,24,.30)';
         ctx.shadowColor=b.team?rgba(color,.42):'transparent';ctx.shadowBlur=b.team?5:0;
         ctx.strokeStyle=color;ctx.lineWidth=b.team?2.3:1.2;
         ctx.beginPath();ctx.moveTo(toX(a.time),toY(a.value));ctx.lineTo(toX(b.time),toY(b.value));ctx.stroke();
@@ -2872,8 +2872,8 @@ button:hover,button:focus-visible{transform:none!important;filter:none!important
     }else{
       const message='Seleciona a posse da Equipa A ou B';
       ctx.font=`850 ${clamp(width/56,6.5,9)}px system-ui`;const textW=ctx.measureText(message).width;
-      ctx.fillStyle='rgba(255,255,255,.08)';roundRect(ctx,width/2-textW/2-9,mid-10,textW+18,20,6);ctx.fill();
-      ctx.fillStyle='rgba(255,255,255,.62)';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(message,width/2,mid);
+      ctx.fillStyle='rgba(16,20,24,.055)';roundRect(ctx,width/2-textW/2-9,mid-10,textW+18,20,6);ctx.fill();
+      ctx.fillStyle='rgba(16,20,24,.60)';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(message,width/2,mid);
     }
 
     /* Eventos ficam marcados sem alterar a curva, que continua dependente apenas da posse. */
@@ -2881,7 +2881,7 @@ button:hover,button:focus-visible{transform:none!important;filter:none!important
       const time=absoluteEventSecond(event);if(time>series.lastTime+2)return;
       const x=toX(time),y=toY(valueAt(points,time));
       const color=event.action==='golo'?'#f8d648':event.action==='expulsao'?'#ff5d68':'#ffffff';
-      ctx.fillStyle=color;ctx.strokeStyle='#0b121b';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(x,y,3.4,0,Math.PI*2);ctx.fill();ctx.stroke();
+      ctx.fillStyle=color;ctx.strokeStyle='#26323c';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(x,y,3.4,0,Math.PI*2);ctx.fill();ctx.stroke();
     });
 
     const events=state.fieldEvents||[];
@@ -2904,5 +2904,48 @@ button:hover,button:focus-visible{transform:none!important;filter:none!important
   setTimeout(redraw,180);
 })();
 </script>
+
+
+<style id="statsvision-v28-white-and-analysis-full">
+/* V28 — Attack Momentum em fundo branco e Centro de Análise até ao rebordo. */
+.momentumCanvasWrap{
+  background:#fff!important;
+  border-color:var(--border)!important;
+}
+
+/* No painel principal, elimina a folga lateral de 3 px criada pelo contentor da arena. */
+#arenaContent.hasAnalysisCenter>.analysisCenter{
+  width:calc(100% + 6px)!important;
+  max-width:calc(100% + 6px)!important;
+  margin-left:-3px!important;
+  margin-right:-3px!important;
+  border-left:0!important;
+  border-right:0!important;
+  border-bottom:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+
+/* Na ampliação exclusiva, o Centro de Análise ocupa todo o quadrado disponível. */
+.analysisOnlyStage{
+  padding:0!important;
+  overflow:hidden!important;
+}
+.analysisOnlyStage .analysisCenter{
+  min-height:100%!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+
+@media(max-width:1100px) and (orientation:landscape){
+  #arenaContent.hasAnalysisCenter>.analysisCenter{
+    width:calc(100% + 4px)!important;
+    max-width:calc(100% + 4px)!important;
+    margin-left:-2px!important;
+    margin-right:-2px!important;
+  }
+}
+</style>
 
 </body></html>
